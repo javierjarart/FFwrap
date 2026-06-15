@@ -1,7 +1,9 @@
-# ffwrap
+# FFwrap
 
 GUI wrapper de FFmpeg para secuencias de imágenes y transcoding.
 Construido con Tauri + React + JetBrains Mono.
+
+[![Build Windows](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml/badge.svg)](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml)
 
 ## Features
 
@@ -15,7 +17,14 @@ Construido con Tauri + React + JetBrains Mono.
 
 ---
 
-## Setup (Windows)
+## Descargar
+
+Los instaladores `.msi` y `.exe` se generan automáticamente via GitHub Actions.
+Ve a [Releases](https://github.com/javierjarart/FFwrap/releases) y descarga la última versión.
+
+---
+
+## Build desde código
 
 ### Requisitos
 
@@ -35,23 +44,25 @@ rustup default stable
 ### 2. Clonar y configurar
 
 ```powershell
-git clone https://github.com/tu-usuario/ffwrap.git
-cd ffwrap
+git clone https://github.com/javierjarart/FFwrap.git
+cd FFwrap
 npm install
 ```
 
-### 3. Bundlear FFmpeg
+### 3. FFmpeg
 
-Descarga la build estática de FFmpeg para Windows desde:
-https://www.gyan.dev/ffmpeg/builds/ → `ffmpeg-release-essentials.zip`
+El workflow de CI descarga `ffmpeg.exe` automáticamente desde gyan.dev.
+Para build local, descárgalo manualmente:
 
-Extrae y copia `ffmpeg.exe` a:
-```
-ffwrap/src-tauri/resources/ffmpeg.exe
+```powershell
+# Descarga ffmpeg-release-essentials.zip desde
+# https://www.gyan.dev/ffmpeg/builds/
+# Extrae y copia:
+copy ffmpeg.exe src-tauri/resources/
 ```
 
 > El archivo `ffmpeg.exe` (~100MB) no se incluye en el repo por tamaño.
-> Tauri lo bundlea automáticamente al hacer build gracias a la config `"resources": ["resources/*"]`.
+> Tauri lo bundlea automáticamente gracias a `"resources": ["resources/*"]`.
 
 ### 4. Dev mode
 
@@ -69,26 +80,44 @@ El instalador `.msi` queda en `src-tauri/target/release/bundle/msi/`.
 
 ---
 
+## CI / CD
+
+El workflow en [`.github/workflows/build.yml`](.github/workflows/build.yml) hace build en Windows automáticamente:
+
+- **Al pushear un tag `v*`** (ej. `v0.1.0`): genera `.msi` y `.exe` y crea un Release draft
+- **Manual**: desde Actions → Build Windows → Run workflow
+
+Flujo típico:
+
+```bash
+git tag v0.1.0
+git push origin main --tags
+# → Actions genera el instalador y lo deja en Releases
+```
+
 ## Estructura
 
 ```
 ffwrap/
+├── .github/workflows/
+│   └── build.yml          # CI: build Windows + release
 ├── src-tauri/
 │   ├── src/
-│   │   ├── main.rs       # Entry point Tauri, registro de comandos
-│   │   ├── ffmpeg.rs     # Spawn proceso FFmpeg, stream de eventos
-│   │   └── probe.rs      # Detección automática de patrón de frames
+│   │   ├── main.rs        # Entry point Tauri
+│   │   ├── ffmpeg.rs      # Spawn FFmpeg, stream de eventos
+│   │   └── probe.rs       # Detección automática de patrón de frames
+│   ├── icons/             # Iconos de la aplicación
 │   ├── resources/
-│   │   └── ffmpeg.exe    # ← copiar aquí (no incluido en repo)
+│   │   └── ffmpeg.exe     # ← se añade en CI (no incluido en repo)
 │   └── tauri.conf.json
 ├── src/
-│   ├── App.jsx           # UI principal
+│   ├── App.jsx            # UI principal
 │   ├── components/
-│   │   ├── DropZone.jsx      # Selector de carpeta/archivo
-│   │   ├── CommandPreview.jsx # Comando FFmpeg con syntax highlighting
-│   │   └── LogPanel.jsx      # Log de output en tiempo real
+│   │   ├── DropZone.jsx
+│   │   ├── CommandPreview.jsx
+│   │   └── LogPanel.jsx
 │   └── lib/
-│       └── buildCommand.js   # Construcción del comando (pura, sin efectos)
+│       └── buildCommand.js
 └── package.json
 ```
 
@@ -105,4 +134,4 @@ ffwrap/
 
 1. Añadir la lógica en `src/lib/buildCommand.js` (función pura)
 2. Agregar UI en `src/App.jsx`
-3. Si necesita acceso al filesystem fuera de los permisos actuales, actualizar `allowlist` en `tauri.conf.json`
+3. Si necesita acceso al filesystem, actualizar `allowlist` en `tauri.conf.json`
