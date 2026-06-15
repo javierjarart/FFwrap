@@ -1,0 +1,28 @@
+[package]
+name = "ffwrap"
+version = "0.1.0"
+description = "FFmpeg GUI wrapper for image sequences and transcoding"
+authors = []
+license = ""
+repository = ""
+default-run = "ffwrap"
+edition = "2021"
+rust-version = "1.60"
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+tauri = { version = "1.6", features = [
+  "dialog-open",
+  "event-all",
+  "path-all",
+  "system-tray"
+] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
+default = ["custom-protocol"]
