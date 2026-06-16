@@ -24,7 +24,7 @@
         "all": false
       },
       "clipboard": {
-        "write-text": true
+        "all": true
       },
       "window": {
         "all": true
