@@ -125,7 +125,7 @@ export default function App() {
   useEffect(() => {
     const el = document.getElementById("titlebar");
     if (!el) return;
-    const handler = () => appWindow.startDragging();
+    const handler = (e) => { if (e.target.closest("button")) return; appWindow.startDragging(); };
     el.addEventListener("mousedown", handler);
     return () => el.removeEventListener("mousedown", handler);
   }, []);
@@ -240,13 +240,30 @@ export default function App() {
           alignItems: "center",
           gap: "8px",
           flexShrink: 0,
-          cursor: "grab",
         }}
       >
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57" }} />
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E" }} />
-        <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#28C840" }} />
-        <span style={{ marginLeft: "auto", fontSize: "11px", color: "#333", letterSpacing: "0.08em" }}>
+        <button
+          onClick={() => appWindow.close()}
+          style={{ width: 10, height: 10, borderRadius: "50%", background: "#FF5F57", border: "none", cursor: "pointer", flexShrink: 0 }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#FF7B73"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "#FF5F57"}
+          aria-label="close"
+        />
+        <button
+          onClick={() => appWindow.minimize()}
+          style={{ width: 10, height: 10, borderRadius: "50%", background: "#FEBC2E", border: "none", cursor: "pointer", flexShrink: 0 }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#FED06A"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "#FEBC2E"}
+          aria-label="minimize"
+        />
+        <button
+          onClick={() => appWindow.toggleMaximize()}
+          style={{ width: 10, height: 10, borderRadius: "50%", background: "#28C840", border: "none", cursor: "pointer", flexShrink: 0 }}
+          onMouseEnter={(e) => e.currentTarget.style.background = "#4DDB62"}
+          onMouseLeave={(e) => e.currentTarget.style.background = "#28C840"}
+          aria-label="maximize"
+        />
+        <span style={{ fontSize: "10px", color: "#333", letterSpacing: "0.08em", marginLeft: "auto" }}>
           FFWRAP v0.1.0
         </span>
       </div>
@@ -443,6 +460,9 @@ export default function App() {
             )}
           </div>
         </div>
+      </div>
+      <div style={{ position: "fixed", bottom: "4px", right: "8px", fontSize: "9px", color: "#2A2A2A", pointerEvents: "none", zIndex: 999 }}>
+        @javierjarart
       </div>
     </div>
   );
