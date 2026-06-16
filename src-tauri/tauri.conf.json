@@ -23,6 +23,9 @@
       "shell": {
         "all": false
       },
+      "clipboard": {
+        "write-text": true
+      },
       "window": {
         "all": true
       }
