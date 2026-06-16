@@ -17,9 +17,6 @@
       "dialog": {
         "open": true
       },
-      "event": {
-        "all": true
-      },
       "path": {
         "all": true
       },
