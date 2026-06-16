@@ -32,13 +32,17 @@ jobs:
         shell: pwsh
         run: |
           $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+          $extractDir = "$env:TEMP\ffmpeg_extract"
           $zip = "$env:TEMP\ffmpeg.zip"
           Write-Host "Downloading ffmpeg from $url ..."
           curl.exe -sL "$url" -o "$zip"
           Write-Host "Extracting ffmpeg.exe ..."
-          7z x "$zip" -o"$env:TEMP\ffmpeg" -y *bin/ffmpeg.exe | Out-Null
-          New-Item -ItemType Directory -Force -Path src-tauri/resources
-          Copy-Item "$env:TEMP\ffmpeg\ffmpeg-*\bin\ffmpeg.exe" src-tauri/resources\ffmpeg.exe
+          New-Item -ItemType Directory -Force -Path $extractDir | Out-Null
+          7z x "$zip" -o"$extractDir" -y | Out-Null
+          $exe = Get-ChildItem -Path $extractDir -Recurse -Filter "ffmpeg.exe" | Select-Object -First 1
+          if (-not $exe) { throw "ffmpeg.exe not found in extracted files" }
+          New-Item -ItemType Directory -Force -Path src-tauri/resources | Out-Null
+          Copy-Item $exe.FullName src-tauri/resources\ffmpeg.exe -Force
           Write-Host "ffmpeg.exe ready at src-tauri/resources/ffmpeg.exe"
 
       - name: Install npm dependencies
