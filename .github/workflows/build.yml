@@ -46,7 +46,7 @@ jobs:
           Write-Host "ffmpeg.exe ready at src-tauri/resources/ffmpeg.exe"
 
       - name: Install npm dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build Tauri app
         run: npm run tauri build -- --bundles msi
