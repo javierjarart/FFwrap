@@ -131,7 +131,7 @@ fn detect_pattern(filename: &str, ext: &str) -> Option<String> {
 
   if num_part.is_empty() {
     // filename is purely numeric like "00001.png"
-    let purely_numeric: Option<usize> = stem.parse().ok().map(|_| stem.len());
+    let purely_numeric: Option<usize> = stem.parse::<usize>().ok().map(|_| stem.len());
     if let Some(width) = purely_numeric {
       return Some(format!("%0{width}d.{ext}"));
     }

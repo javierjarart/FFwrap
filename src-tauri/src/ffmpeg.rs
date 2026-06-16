@@ -1,5 +1,5 @@
 use std::process::Stdio;
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use tauri::{command, AppHandle, Manager};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
