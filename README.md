@@ -4,6 +4,8 @@ GUI wrapper de FFmpeg para convertir secuencias de imágenes a video y transcodi
 
 [![Build Windows](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml/badge.svg)](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml)
 
+![screenshot](screenshot.png)
+
 ## Descargar
 
 Descarga el instalador desde [Releases](https://github.com/javierjarart/FFwrap/releases):
