@@ -148,3 +148,50 @@ fn detect_pattern(filename: &str, ext: &str) -> Option<String> {
     Some(format!("{prefix}%d.{ext}"))
   }
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_detect_pattern_zero_padded() {
+    let result = detect_pattern("frame_0001.png", "png");
+    assert_eq!(result, Some("frame_%04d.png".into()));
+  }
+
+  #[test]
+  fn test_detect_pattern_unpadded() {
+    let result = detect_pattern("render1.png", "png");
+    assert_eq!(result, Some("render%d.png".into()));
+  }
+
+  #[test]
+  fn test_detect_pattern_purely_numeric() {
+    let result = detect_pattern("00001.png", "png");
+    assert_eq!(result, Some("%05d.png".into()));
+  }
+
+  #[test]
+  fn test_detect_pattern_exr_format() {
+    let result = detect_pattern("shot_0100.exr", "exr");
+    assert_eq!(result, Some("shot_%04d.exr".into()));
+  }
+
+  #[test]
+  fn test_detect_pattern_no_number() {
+    let result = detect_pattern("readme.txt", "txt");
+    assert_eq!(result, None);
+  }
+
+  #[test]
+  fn test_detect_pattern_single_digit_unpadded() {
+    let result = detect_pattern("frame1.png", "png");
+    assert_eq!(result, Some("frame%d.png".into()));
+  }
+
+  #[test]
+  fn test_detect_pattern_double_zero_padded() {
+    let result = detect_pattern("img_001.png", "png");
+    assert_eq!(result, Some("img_%03d.png".into()));
+  }
+}

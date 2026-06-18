@@ -225,3 +225,46 @@ pub async fn cancel_ffmpeg() -> Result<(), String> {
   }
   Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_parse_progress_full_line() {
+    let line = "frame=  892 fps=210 q=18.0 size=   14208kB time=00:00:29.70 bitrate=3915.2kbits/s speed=7.01x";
+    let p = parse_progress(line).unwrap();
+    assert_eq!(p.frame, Some(892));
+    assert_eq!(p.fps, Some(210.0));
+    assert_eq!(p.size_kb, Some(14208));
+    assert_eq!(p.time, Some("00:00:29.70".into()));
+    assert_eq!(p.bitrate, Some("3915.2kbits/s".into()));
+    assert_eq!(p.speed, Some("7.01x".into()));
+  }
+
+  #[test]
+  fn test_parse_progress_no_frame_returns_none() {
+    let line = "something without frame= marker";
+    assert!(parse_progress(line).is_none());
+  }
+
+  #[test]
+  fn test_parse_progress_partial() {
+    let line = "frame= 123 fps= 60";
+    let p = parse_progress(line).unwrap();
+    assert_eq!(p.frame, Some(123));
+    assert_eq!(p.fps, Some(60.0));
+    assert_eq!(p.size_kb, None);
+    assert_eq!(p.time, None);
+  }
+
+  #[test]
+  fn test_parse_progress_with_empty_fields() {
+    let line = "frame= 0 fps=0.0 size=     0kB time=N/A bitrate=N/A speed=N/A";
+    let p = parse_progress(line).unwrap();
+    assert_eq!(p.frame, Some(0));
+    assert_eq!(p.fps, Some(0.0));
+    assert_eq!(p.size_kb, Some(0));
+    assert_eq!(p.time, Some("N/A".into()));
+  }
+}

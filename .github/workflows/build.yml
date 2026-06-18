@@ -48,6 +48,13 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Run Rust tests
+        working-directory: src-tauri
+        run: cargo test
+
       - name: Build Tauri app
         run: npm run tauri build -- --bundles msi --bundles nsis
 
