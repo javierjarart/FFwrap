@@ -244,7 +244,7 @@ mod tests {
 
   #[test]
   fn test_parse_progress_no_frame_returns_none() {
-    let line = "something without frame= marker";
+    let line = "something without the frame marker";
     assert!(parse_progress(line).is_none());
   }
 

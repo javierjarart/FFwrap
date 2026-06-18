@@ -125,16 +125,18 @@ fn detect_pattern(filename: &str, ext: &str) -> Option<String> {
   let stem = Path::new(filename).file_stem()?.to_str()?;
 
   // Find trailing numeric segment
-  let num_start = stem.rfind(|c: char| !c.is_ascii_digit())?;
-  let prefix = &stem[..=num_start];
-  let num_part = &stem[num_start + 1..];
+  let num_start = stem.rfind(|c: char| !c.is_ascii_digit());
 
-  if num_part.is_empty() {
-    // filename is purely numeric like "00001.png"
-    let purely_numeric: Option<usize> = stem.parse::<usize>().ok().map(|_| stem.len());
-    if let Some(width) = purely_numeric {
+  let (prefix, num_part) = match num_start {
+    Some(pos) => (&stem[..=pos], &stem[pos + 1..]),
+    None => {
+      // filename is purely numeric like "00001.png"
+      let width = stem.len();
       return Some(format!("%0{width}d.{ext}"));
     }
+  };
+
+  if num_part.is_empty() {
     return None;
   }
 
