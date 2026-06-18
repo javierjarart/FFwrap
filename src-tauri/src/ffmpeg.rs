@@ -90,15 +90,13 @@ pub async fn run_ffmpeg(
       let mut cmd = Command::new(&ffmpeg_path);
       cmd.args(&args);
       const IDLE_PRIORITY_CLASS: u32 = 0x00000040;
-      cmd.creation_flags(IDLE_PRIORITY_CLASS);
-      cmd.stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()
+      cmd.as_std_mut().creation_flags(IDLE_PRIORITY_CLASS);
+      cmd.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn()
     }
     #[cfg(not(target_os = "windows"))]
     {
-      let mut cmd = Command::new("nice");
-      cmd.arg("-n19")
+      Command::new("nice")
+        .arg("-n19")
         .arg(&ffmpeg_path)
         .args(&args)
         .stdout(Stdio::piped())
