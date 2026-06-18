@@ -10,9 +10,12 @@ Construido con Tauri + React + JetBrains Mono.
 - **Sequence → video**: PNG / EXR / TIFF / TGA → MP4, MOV, MXF
 - **Transcode**: cambiar codec/CRF/pix_fmt de cualquier video
 - Detección automática del patrón de frames (`frame_%04d.png`, etc.)
+- **Selección de carpeta de salida** mediante diálogo Guardar como
+- **Control de hilos** — limita el uso de CPU durante el render
+- **Prioridad baja** automática — el proceso FFmpeg se ejecuta en idle/low priority para no saturar el PC
 - Preview del comando FFmpeg generado en tiempo real
+- Barra de progreso con % · frames · fps · velocidad de encode
 - Log de output con colores por nivel
-- Progress bar con frame count, fps, y velocidad de encode
 - FFmpeg bundleado — no requiere instalación en el sistema
 
 ---
