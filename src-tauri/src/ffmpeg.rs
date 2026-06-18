@@ -69,6 +69,7 @@ pub async fn run_ffmpeg(
   app: AppHandle,
   args: Vec<String>,
   total_frames: Option<u64>,
+  low_priority: bool,
 ) -> Result<String, String> {
   let ffmpeg_path = get_ffmpeg_path(&app);
 
@@ -82,12 +83,36 @@ pub async fn run_ffmpeg(
     )
     .ok();
 
-  let mut child = Command::new(&ffmpeg_path)
-    .args(&args)
-    .stdout(Stdio::piped())
-    .stderr(Stdio::piped())
-    .spawn()
-    .map_err(|e| format!("Failed to spawn ffmpeg: {e}"))?;
+  let mut child = if low_priority {
+    #[cfg(target_os = "windows")]
+    {
+      use std::os::windows::process::CommandExt;
+      let mut cmd = Command::new(&ffmpeg_path);
+      cmd.args(&args);
+      const IDLE_PRIORITY_CLASS: u32 = 0x00000040;
+      cmd.creation_flags(IDLE_PRIORITY_CLASS);
+      cmd.stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+    }
+    #[cfg(not(target_os = "windows"))]
+    {
+      let mut cmd = Command::new("nice");
+      cmd.arg("-n19")
+        .arg(&ffmpeg_path)
+        .args(&args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+    }
+  } else {
+    Command::new(&ffmpeg_path)
+      .args(&args)
+      .stdout(Stdio::piped())
+      .stderr(Stdio::piped())
+      .spawn()
+  }
+  .map_err(|e| format!("Failed to spawn ffmpeg: {e}"))?;
 
   // Store PID for cancellation
   if let Some(pid) = child.id() {

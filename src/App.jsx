@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from "@tauri-apps/api/event";
 import { appWindow } from "@tauri-apps/api/window";
+import { save } from "@tauri-apps/api/dialog";
 import DropZone from "./components/DropZone";
 import CommandPreview from "./components/CommandPreview";
 import LogPanel from "./components/LogPanel";
@@ -117,6 +118,8 @@ export default function App() {
   const [trimEnd, setTrimEnd] = useState("");
   const [audioNormalize, setAudioNormalize] = useState(false);
   const [audioVolume, setAudioVolume] = useState(1.0);
+  const [threads, setThreads] = useState(0);
+  const [outputPath, setOutputPath] = useState("");
   const [status, setStatus] = useState("idle"); // idle | running | done | error
   const [progress, setProgress] = useState({ pct: 0, frame: 0, fps: 0, speed: "" });
   const [logs, setLogs] = useState([]);
@@ -192,6 +195,26 @@ export default function App() {
     setLogs([]);
   }, []);
 
+  const handleSelectOutput = useCallback(async () => {
+    const ext = CODEC_EXTENSIONS[codec] || ".mp4";
+    const defaultName = outputName || `output${ext}`;
+    try {
+      const path = await save({
+        defaultPath: defaultName,
+        filters: [
+          { name: "Video", extensions: ["mp4", "mov", "mxf", "mkv", "avi"] },
+        ],
+      });
+      if (path) {
+        setOutputPath(path);
+        const parts = path.split("\\").join("/").split("/");
+        setOutputName(parts[parts.length - 1]);
+      }
+    } catch (e) {
+      // user cancelled
+    }
+  }, [codec, outputName]);
+
   const { args, cmdString } = buildCommand({
     mode,
     inputDir,
@@ -202,6 +225,8 @@ export default function App() {
     crf,
     pixFmt,
     outputName,
+    outputPath: outputPath || undefined,
+    threads,
     trimStart,
     trimEnd,
     audioNormalize,
@@ -218,7 +243,7 @@ export default function App() {
     setProgress({ pct: 0, frame: 0, fps: 0, speed: "" });
     setLogs([]);
     try {
-      await invoke("run_ffmpeg", { args, totalFrames });
+      await invoke("run_ffmpeg", { args, totalFrames, lowPriority: true });
     } catch (e) {
       setLogs((prev) => [...prev, { line: String(e), level: "error", ts: nowTs() }]);
       setStatus("error");
@@ -352,6 +377,11 @@ export default function App() {
               <Slider label={`quality (CRF) — lower = better`} min={0} max={51} value={crf} onChange={setCrf} />
             )}
 
+            <div style={{ marginBottom: "12px" }}>
+              <SectionLabel>performance</SectionLabel>
+              <Slider label={`threads (0 = auto)`} min={0} max={16} value={threads} onChange={setThreads} />
+            </div>
+
             {pixFmtOptions.length > 0 && (
               <Field label="pixel format">
                 <ToggleGroup options={pixFmtOptions} value={pixFmt} onChange={setPixFmt} />
@@ -373,7 +403,34 @@ export default function App() {
             </div>
 
             <Field label="output filename">
-              <TextInput value={outputName} onChange={setOutputName} placeholder="output.mp4" />
+              <div style={{ display: "flex", gap: "6px" }}>
+                <div style={{ flex: 1 }}>
+                  <TextInput value={outputName} onChange={setOutputName} placeholder="output.mp4" />
+                </div>
+                <button
+                  onClick={handleSelectOutput}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid #2A2A2A",
+                    borderRadius: "3px",
+                    color: "#888",
+                    fontSize: "11px",
+                    padding: "4px 10px",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    transition: "border-color 0.1s, color 0.1s",
+                  }}
+                  title="Choose output folder"
+                >
+                  Browse
+                </button>
+              </div>
+              {outputPath && (
+                <div style={{ fontSize: "10px", color: "#555", marginTop: "4px", wordBreak: "break-all" }}>
+                  {outputPath.split("\\").join("/").split("/").slice(0, -1).join("/")}/
+                </div>
+              )}
             </Field>
           </div>
         </div>
@@ -384,16 +441,55 @@ export default function App() {
           <LogPanel entries={logs} />
 
           {/* Progress bar */}
-          <div style={{ height: "2px", background: "#141414", flexShrink: 0 }}>
+          {status === "running" && (
             <div
               style={{
-                height: "2px",
-                background: "#C8FF00",
-                width: `${progress.pct}%`,
-                transition: "width 0.3s ease",
+                padding: "0 16px",
+                paddingTop: "8px",
+                flexShrink: 0,
               }}
-            />
-          </div>
+            >
+              <div
+                style={{
+                  height: "20px",
+                  background: "#141414",
+                  borderRadius: "4px",
+                  position: "relative",
+                  overflow: "hidden",
+                  border: "1px solid #1E1E1E",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    background: "#C8FF00",
+                    width: `${Math.max(progress.pct, 2)}%`,
+                    transition: "width 0.3s ease",
+                    borderRadius: "3px",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "10px",
+                    color: progress.pct > 50 ? "#0A0A0A" : "#C8FF00",
+                    fontWeight: 600,
+                    fontFamily: "'JetBrains Mono', monospace",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  {progress.pct}% · {progress.frame.toLocaleString()} frames · {progress.fps} fps · {progress.speed}
+                </div>
+              </div>
+            </div>
+          )}
+          {status !== "running" && (
+            <div style={{ height: "2px", background: "#141414", flexShrink: 0 }} />
+          )}
 
           {/* Footer */}
           <div

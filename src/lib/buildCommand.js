@@ -13,7 +13,9 @@ export function buildCommand(state) {
     crf,
     pixFmt,
     outputName,
+    outputPath,   // full output path (optional)
     startFrame,   // for sequence mode
+    threads,      // 0 = auto
     // transcode specific
     trimStart,
     trimEnd,
@@ -38,6 +40,11 @@ export function buildCommand(state) {
     if (trimStart) args.push("-ss", trimStart);
     if (trimEnd) args.push("-to", trimEnd);
     args.push("-i", inputFile || "input.mp4");
+  }
+
+  // Threads — limit CPU usage
+  if (threads && threads > 0) {
+    args.push("-threads", String(threads));
   }
 
   // Codec
@@ -84,7 +91,7 @@ export function buildCommand(state) {
     args.push("-movflags", "+faststart");
   }
 
-  args.push(outputName || "output.mp4");
+  args.push(outputPath || outputName || "output.mp4");
 
   // Human-readable command string (for display)
   const cmdString = ["ffmpeg", ...args]
