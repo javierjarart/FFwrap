@@ -1,8 +1,18 @@
 # FFwrap
 
-GUI wrapper de FFmpeg para convertir secuencias de imágenes a video y transcodificar archivos.
+<p align="center">
+  <b>GUI wrapper de FFmpeg</b> — convierte secuencias de imágenes a video y transcodifica archivos.
+</p>
 
-[![Build Windows](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml/badge.svg)](https://github.com/javierjarart/FFwrap/actions/workflows/build.yml)
+<p align="center">
+  <a href="https://github.com/javierjarart/FFwrap/releases/latest"><img src="https://img.shields.io/github/v/release/javierjarart/FFwrap?style=flat-square&label=versión&color=C8FF00&labelColor=1A1A1A" alt="Release"></a>
+  <a href="https://github.com/javierjarart/FFwrap/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/javierjarart/FFwrap/build.yml?style=flat-square&label=build&color=C8FF00&labelColor=1A1A1A" alt="Build"></a>
+  <a href="https://github.com/javierjarart/FFwrap/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/javierjarart/FFwrap/build.yml?style=flat-square&label=tests&color=C8FF00&labelColor=1A1A1A" alt="Tests"></a>
+  <a href="https://tauri.app"><img src="https://img.shields.io/badge/Tauri-1.6-C8FF00?style=flat-square&labelColor=1A1A1A" alt="Tauri"></a>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/React-18-C8FF00?style=flat-square&labelColor=1A1A1A" alt="React"></a>
+  <a href="https://ffmpeg.org"><img src="https://img.shields.io/badge/FFmpeg-bundleado-C8FF00?style=flat-square&labelColor=1A1A1A" alt="FFmpeg"></a>
+  <a href="https://github.com/javierjarart/FFwrap"><img src="https://img.shields.io/badge/platform-Windows-C8FF00?style=flat-square&labelColor=1A1A1A" alt="Windows"></a>
+</p>
 
 ![screenshot](screenshot.png)
 
