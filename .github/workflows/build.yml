@@ -51,6 +51,9 @@ jobs:
       - name: Run frontend tests
         run: npm test
 
+      - name: Build frontend (required for Rust tests)
+        run: npm run build
+
       - name: Run Rust tests
         working-directory: src-tauri
         run: cargo test
