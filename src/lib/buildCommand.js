@@ -32,7 +32,7 @@ export function buildCommand(state) {
     }
     args.push("-framerate", String(fps));
     const inputPath = inputDir
-      ? `${inputDir}\\${pattern}`
+      ? `${inputDir}/${pattern}`
       : pattern;
     args.push("-i", inputPath);
   } else {

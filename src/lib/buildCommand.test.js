@@ -39,9 +39,9 @@ describe("buildCommand", () => {
   });
 
   it("handles sequence mode with inputDir", () => {
-    const { args } = buildCommand({ ...defaults, inputDir: "C:\\frames" });
+    const { args } = buildCommand({ ...defaults, inputDir: "/home/frames" });
     const iIndex = args.indexOf("-i");
-    expect(args[iIndex + 1]).toBe("C:\\frames\\frame_%04d.png");
+    expect(args[iIndex + 1]).toBe("/home/frames/frame_%04d.png");
   });
 
   it("handles sequence mode without inputDir", () => {
